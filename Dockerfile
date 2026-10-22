@@ -1,20 +1,18 @@
 
-const express = require("express");
+FROM node:22-alpine
 
-const app = express();
-const port = process.env.PORT || 3000;
+ENV NODE_ENV=production
 
-app.get("/", (_, res) => {
-  res.json({
-    service: "docker-lab",
-    status: "ok"
-  });
-});
+WORKDIR /app
 
-app.get("/health", (_, res) => {
-  res.status(200).send("ok");
-});
+COPY package.json ./
 
-app.listen(port, "0.0.0.0", () => {
-  console.log(`Listening on ${port}`);
-});
+RUN npm install --omit=dev && npm cache clean --force
+
+COPY app.js ./
+
+USER node
+
+EXPOSE 3000
+
+CMD ["node", "app.js"]
